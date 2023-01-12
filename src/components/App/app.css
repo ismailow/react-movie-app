@@ -1,0 +1,12 @@
+.app {
+  background-color: #fff;
+  width: 1010px;
+  padding: 20px 30px;
+  margin: 0 auto;
+}
+
+.app__movies-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 36px;
+}
