@@ -16,7 +16,7 @@ function Card(props) {
       <img
         className="card__poster"
         src={`https://image.tmdb.org/t/p/w500/${poster}`}
-        alt="Placeholder"
+        alt="Movie poster"
       />
       <div className="card__info">
         <h3 className="card__title">{title}</h3>

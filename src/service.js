@@ -1,3 +1,5 @@
+import NotFoundError from './errors/notFoundError';
+
 export default class MovieAPI {
   apiKey = '31e0e9c91112b9de4b7b778129587021';
 
@@ -12,6 +14,12 @@ export default class MovieAPI {
       throw new Error(`Error ${response.status}`);
     }
 
-    return response.json();
+    const request = await response.json();
+
+    if (request.results.length === 0) {
+      throw new NotFoundError();
+    }
+
+    return request;
   }
 }

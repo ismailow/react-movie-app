@@ -3,10 +3,18 @@
   width: 1010px;
   padding: 20px 30px;
   margin: 0 auto;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.app__movies-list {
+.app__movies-list span {
   display: flex;
   flex-wrap: wrap;
   gap: 36px;
+}
+
+.ant-alert {
+  padding: 20px 40px;
 }

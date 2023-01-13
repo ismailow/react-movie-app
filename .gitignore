@@ -4,6 +4,11 @@
 /node_modules
 /.pnp
 .pnp.js
+/.vscode
+.editorconfig
+.eslintignore
+.eslintrc.js
+.prettierrc
 
 # testing
 /coverage
