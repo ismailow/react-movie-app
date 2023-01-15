@@ -1,0 +1,10 @@
+.app__search-input {
+  width: 100%;
+  border: 1px solid #D9D9D9;
+  border-radius: 4px;
+  padding: 12px 9px;
+  margin-bottom: 34px;
+  font-family: Inter, sans-serif;
+  font-size: 16px;
+  line-height: 22px;
+}

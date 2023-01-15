@@ -5,9 +5,11 @@ export default class MovieAPI {
 
   baseURL = 'https://api.themoviedb.org/3';
 
-  async getMovies() {
+  async getMovies(query, page) {
     const response = await fetch(
-      `${this.baseURL}/search/movie?api_key=${this.apiKey}&language=en-US&query=return&page=1&include_adult=false`
+      `${this.baseURL}/search/movie?api_key=${this.apiKey}&language=en-US&query=${query || 'return'}&page=${
+        page || 1
+      }&include_adult=false`
     );
 
     if (!response.ok) {

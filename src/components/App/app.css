@@ -4,9 +4,6 @@
   padding: 20px 30px;
   margin: 0 auto;
   min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 
 .app__movies-list span {
@@ -17,4 +14,19 @@
 
 .ant-alert {
   padding: 20px 40px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.ant-spin {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.ant-pagination {
+  margin: 0 auto;
 }
