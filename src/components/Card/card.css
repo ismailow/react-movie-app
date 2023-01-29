@@ -13,6 +13,24 @@
 .card__info {
   margin-left: 20px;
   padding: 10px 20px 20px 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.card__header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.card__rating {
+  flex: 0 0 30px;
+  height: 30px;
+  border: 2px solid #000;
+  border-radius: 50%;
+  font-size: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .card__title {
@@ -31,6 +49,7 @@
 
 .card__genres {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   margin-bottom: 7px;
 }
@@ -47,4 +66,14 @@
 .card__description {
   font-size: 14px;
   line-height: 22px;
+  flex: 1 1 auto;
+}
+
+.ant-rate {
+  font-size: 17px;
+  margin-top: 10px;
+}
+
+.ant-rate-star {
+  margin-inline-end: 5px !important;
 }

@@ -1,4 +1,8 @@
 import format from 'date-fns/format';
+import { Rate } from 'antd';
+
+import GenresContext from '../../context';
+
 import './card.css';
 
 function Card(props) {
@@ -10,24 +14,73 @@ function Card(props) {
     return `${trimmedStr.join(' ')}...`;
   }
 
-  const { title, date, poster, overview } = props;
+  const { title, date, poster, overview, rating, movieId, onRateMovie, stars, movieGenres } = props;
+
+  function getRatingColor() {
+    if (rating <= 3) {
+      return '#E90000';
+    } else if (rating > 3 && rating < 5) {
+      return '#E97E00';
+    } else if (rating > 5 && rating < 7) {
+      return '#E9D100';
+    } else {
+      return '#66E900';
+    }
+  }
+
+  function setGenres(genres) {
+    return movieGenres.map((item) => {
+      let genreName = '';
+      genres.forEach((genre) => {
+        if (genre.id === item) {
+          genreName = genre.name;
+        }
+      });
+      return (
+        <li
+          className="card__genre"
+          key={item}
+        >
+          {genreName}
+        </li>
+      );
+    });
+  }
+
   return (
-    <div className="card">
-      <img
-        className="card__poster"
-        src={`https://image.tmdb.org/t/p/w500/${poster}`}
-        alt="Movie poster"
-      />
-      <div className="card__info">
-        <h3 className="card__title">{title}</h3>
-        <p className="card__date">{format(new Date(date), 'MMMM d, yyyy')}</p>
-        <ul className="card__genres">
-          <li className="card__genre">Action</li>
-          <li className="card__genre">Drama</li>
-        </ul>
-        <p className="card__description">{trimOverview(overview)}</p>
-      </div>
-    </div>
+    <GenresContext.Consumer>
+      {(genres) => (
+        <div className="card">
+          <img
+            className="card__poster"
+            src={`https://image.tmdb.org/t/p/w500/${poster}`}
+            alt="Movie poster"
+          />
+          <div className="card__info">
+            <div className="card__header">
+              <h3 className="card__title">{title}</h3>
+              <div
+                className="card__rating"
+                style={{ borderColor: getRatingColor() }}
+              >
+                {rating}
+              </div>
+            </div>
+            <p className="card__date">{format(new Date(date), 'MMMM d, yyyy')}</p>
+            <ul className="card__genres">{setGenres(genres)}</ul>
+            <p className="card__description">{trimOverview(overview)}</p>
+            <Rate
+              count={10}
+              onChange={(value) => {
+                onRateMovie(value, movieId);
+              }}
+              allowHalf
+              value={stars}
+            />
+          </div>
+        </div>
+      )}
+    </GenresContext.Consumer>
   );
 }
 

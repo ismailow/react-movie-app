@@ -6,22 +6,63 @@ export default class MovieAPI {
   baseURL = 'https://api.themoviedb.org/3';
 
   async getMovies(query, page) {
-    const response = await fetch(
+    const request = await fetch(
       `${this.baseURL}/search/movie?api_key=${this.apiKey}&language=en-US&query=${query || 'return'}&page=${
         page || 1
       }&include_adult=false`
     );
 
-    if (!response.ok) {
-      throw new Error(`Error ${response.status}`);
+    if (!request.ok) {
+      throw new Error(`Error ${request.status}`);
     }
 
-    const request = await response.json();
+    const response = await request.json();
 
-    if (request.results.length === 0) {
+    if (response.results.length === 0) {
       throw new NotFoundError();
     }
 
-    return request;
+    return response;
+  }
+
+  async createGuestSession() {
+    const request = await fetch(`${this.baseURL}/authentication/guest_session/new?api_key=${this.apiKey}`);
+    const response = await request.json();
+    return response;
+  }
+
+  async rateMovie(guestId, movieId, rateValue) {
+    const requestBody = {
+      value: rateValue,
+    };
+
+    const request = await fetch(
+      `${this.baseURL}/movie/${movieId}/rating?api_key=${this.apiKey}&guest_session_id=${guestId}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json;charset=utf-8',
+        },
+        body: JSON.stringify(requestBody),
+      }
+    );
+
+    const response = await request.json();
+    return response;
+  }
+
+  async getRatedMovies(guestId) {
+    const request = await fetch(
+      `${this.baseURL}/guest_session/${guestId}/rated/movies?api_key=${this.apiKey}&language=en-US&sort_by=created_at.asc`
+    );
+
+    const response = await request.json();
+    return response;
+  }
+
+  async getGenres() {
+    const request = await fetch(`${this.baseURL}/genre/movie/list?api_key=${this.apiKey}&language=en-US`);
+    const response = await request.json();
+    return response;
   }
 }

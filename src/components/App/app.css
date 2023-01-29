@@ -14,14 +14,14 @@
 
 .ant-alert {
   padding: 20px 40px;
-  position: absolute;
+  position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
 }
 
 .ant-spin {
-  position: absolute;
+  position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -29,4 +29,11 @@
 
 .ant-pagination {
   margin: 0 auto;
+}
+
+.rated-movies {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 28px;
 }
