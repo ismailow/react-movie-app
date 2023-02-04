@@ -51,9 +51,11 @@ export default class MovieAPI {
     return response;
   }
 
-  async getRatedMovies(guestId) {
+  async getRatedMovies(guestId, page) {
     const request = await fetch(
-      `${this.baseURL}/guest_session/${guestId}/rated/movies?api_key=${this.apiKey}&language=en-US&sort_by=created_at.asc`
+      `${this.baseURL}/guest_session/${guestId}/rated/movies?api_key=${
+        this.apiKey
+      }&language=en-US&sort_by=created_at.asc&&page=${page || 1}`
     );
 
     const response = await request.json();

@@ -14,13 +14,16 @@ export default class App extends Component {
     movies: {},
     ratedMovies: [],
     currentPage: 1,
+    ratedPage: 1,
     totalItems: null,
+    totalRated: null,
     loading: true,
+    ratedLoading: true,
     error: false,
     notFoundError: false,
     query: '',
     genres: [],
-    // guestId: null,
+    guestId: null,
   };
 
   movieAPI = new MovieAPI();
@@ -38,18 +41,13 @@ export default class App extends Component {
         this.setState({ genres: data.genres });
       })
       .then(this.loadMovies());
-    if (localStorage.length < 1) {
-      localStorage.setItem('ratedMovies', JSON.stringify([]));
-    } else {
-      this.setState({ ratedMovies: JSON.parse(localStorage.getItem('ratedMovies')) });
-    }
-    // this.movieAPI
-    //   .createGuestSession()
-    //   .then((data) => {
-    //     this.setState({ guestId: data.guest_session_id });
-    //     return data.guest_session_id;
-    //   })
-    //   .then((id) => this.loadRatedMovies(id));
+    this.movieAPI
+      .createGuestSession()
+      .then((data) => {
+        this.setState({ guestId: data.guest_session_id });
+        return data.guest_session_id;
+      })
+      .then((id) => this.loadRatedMovies(id));
   }
 
   onMoviesLoaded = (movies) => {
@@ -88,53 +86,33 @@ export default class App extends Component {
   };
 
   rateMovie = (value, id) => {
-    const { movies } = this.state;
-    // this.movieAPI
-    //   .rateMovie(guestId, id, value)
-    //   .then(() => this.loadRatedMovies(guestId))
-    //   .then(() => this.setStars());
-    const ratedMoviesArray = JSON.parse(localStorage.getItem('ratedMovies'));
-    const isRated = ratedMoviesArray.some((item) => item.id === id);
-    if (isRated) {
-      const newRatedMoviesArray = ratedMoviesArray.map((item) => {
-        if (item.id === id) {
-          item.rating = value;
-        }
-        return item;
-      });
-      this.setState({ ratedMovies: newRatedMoviesArray });
-    } else {
-      const [ratedMovie] = movies.filter((item) => item.id === id);
-      ratedMovie.rating = value;
-      ratedMoviesArray.push(ratedMovie);
-      localStorage.setItem('ratedMovies', JSON.stringify(ratedMoviesArray));
-      this.setState({ ratedMovies: ratedMoviesArray });
-    }
-    this.setStars();
+    const { guestId } = this.state;
+    this.movieAPI
+      .rateMovie(guestId, id, value)
+      .then(() => this.loadRatedMovies(guestId))
+      .then(() => this.setStars(id, value));
   };
 
-  // loadRatedMovies = (id) => {
-  //   console.log('loading');
-  //   this.movieAPI.getRatedMovies(id).then((data) => this.setState(() => ({ ratedMovies: data.results })));
-  // };
+  loadRatedMovies = (id, page) => {
+    this.setState({ ratedLoading: true });
+    this.movieAPI
+      .getRatedMovies(id, page)
+      .then((data) => {
+        this.setState({ ratedMovies: data.results, totalRated: data.total_results });
+      })
+      .then(() => this.setState({ ratedLoading: false }));
+  };
 
-  setStars = () => {
-    const { ratedMovies } = this.state;
-    this.setState(({ movies }) => {
-      const newMovies = movies.map((searchItems) => {
-        if (ratedMovies.length > 0) {
-          ratedMovies.forEach((ratedItems) => {
-            if (searchItems.id === ratedItems.id) {
-              searchItems.rating = ratedItems.rating;
-            }
-          });
-        }
-        return searchItems;
-      });
-      return {
-        movies: newMovies,
-      };
+  setStars = (id, value) => {
+    const { movies } = this.state;
+    const newMoviesData = movies.map((movie) => {
+      if (movie.id === id) {
+        movie.stars = value;
+      }
+      return movie;
     });
+    console.log(newMoviesData);
+    this.setState({ movies: newMoviesData });
   };
 
   loadMovies(query, page) {
@@ -146,7 +124,6 @@ export default class App extends Component {
       })
       .then((data) => data.results)
       .then(this.onMoviesLoaded)
-      .then(this.setStars)
       .catch((err) => {
         if (err.name === 'NotFoundError') {
           this.onNotFoundError();
@@ -157,7 +134,21 @@ export default class App extends Component {
   }
 
   render() {
-    const { movies, currentPage, totalItems, loading, error, notFoundError, query, ratedMovies, genres } = this.state;
+    const {
+      movies,
+      currentPage,
+      totalItems,
+      loading,
+      error,
+      notFoundError,
+      query,
+      ratedMovies,
+      genres,
+      ratedLoading,
+      totalRated,
+      ratedPage,
+      guestId,
+    } = this.state;
     const hasData = !(loading || error);
     const cards = hasData ? (
       <ShowCards
@@ -180,14 +171,28 @@ export default class App extends Component {
         }}
       />
     ) : null;
-    const hasRatedMovies = ratedMovies.length > 0;
-    const EmptyMessage = !hasRatedMovies ? (
-      <Alert
-        type="info"
-        message="you haven't rated movies yet"
+    const hasRatedMovies = !ratedLoading;
+    const ratedSpinner = ratedLoading ? <Spin size="large" /> : null;
+    const EmptyMessage =
+      ratedMovies.length === 0 && !ratedLoading ? (
+        <Alert
+          type="info"
+          message="You haven't rated movies yet"
+        />
+      ) : null;
+    const ShowRatedMovies = hasRatedMovies ? <ShowCards movies={ratedMovies} /> : null;
+    const ratedPagination = hasRatedMovies ? (
+      <Pagination
+        total={totalRated}
+        current={ratedPage}
+        pageSize={20}
+        showSizeChanger={false}
+        onChange={(page) => {
+          this.loadRatedMovies(guestId, page);
+          this.setState({ ratedPage: page });
+        }}
       />
     ) : null;
-    const ShowRatedMovies = hasRatedMovies ? <ShowCards movies={ratedMovies} /> : null;
 
     return (
       <div className="app">
@@ -195,6 +200,7 @@ export default class App extends Component {
           <Tabs
             defaultActiveKey="search"
             centered
+            onChange={() => this.loadRatedMovies(guestId)}
           >
             <Tabs.TabPane
               tab="Search"
@@ -222,6 +228,8 @@ export default class App extends Component {
             >
               {EmptyMessage}
               <div className="rated-movies">{ShowRatedMovies}</div>
+              {ratedSpinner}
+              {ratedPagination}
             </Tabs.TabPane>
           </Tabs>
         </GenresContext.Provider>
@@ -241,8 +249,9 @@ const ShowCards = ({ movies, onRateMovie }) =>
       rating={movie.vote_average.toFixed(1)}
       movieId={movie.id}
       onRateMovie={onRateMovie || null}
-      stars={movie.rating || 0}
+      stars={movie.stars || movie.rating || 0}
       movieGenres={movie.genre_ids}
+      disabled={!!movie.rating}
     />
   ));
 

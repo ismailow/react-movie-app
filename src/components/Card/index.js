@@ -14,7 +14,11 @@ function Card(props) {
     return `${trimmedStr.join(' ')}...`;
   }
 
-  const { title, date, poster, overview, rating, movieId, onRateMovie, stars, movieGenres } = props;
+  const { title, date, poster, overview, rating, movieId, onRateMovie, stars, movieGenres, disabled } = props;
+
+  const disableHover = {
+    cursor: 'default',
+  };
 
   function getRatingColor() {
     if (rating <= 3) {
@@ -70,12 +74,14 @@ function Card(props) {
             <ul className="card__genres">{setGenres(genres)}</ul>
             <p className="card__description">{trimOverview(overview)}</p>
             <Rate
+              style={disabled ? disableHover : null}
               count={10}
               onChange={(value) => {
                 onRateMovie(value, movieId);
               }}
               allowHalf
               value={stars}
+              disabled={disabled}
             />
           </div>
         </div>
