@@ -111,7 +111,6 @@ export default class App extends Component {
       }
       return movie;
     });
-    console.log(newMoviesData);
     this.setState({ movies: newMoviesData });
   };
 
