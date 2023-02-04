@@ -57,6 +57,19 @@ export default class App extends Component {
       error: false,
       notFoundError: false,
     });
+    const { ratedMovies } = this.state;
+    if (ratedMovies.length > 0) {
+      let newMoviesData = movies;
+      ratedMovies.forEach((rated) => {
+        newMoviesData = movies.map((item) => {
+          if (rated.id === item.id) {
+            item.stars = rated.rating;
+          }
+          return item;
+        });
+      });
+      this.setState({ movies: newMoviesData });
+    }
   };
 
   onError = () => {
