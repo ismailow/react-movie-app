@@ -58,6 +58,10 @@ export default class MovieAPI {
       }&language=en-US&sort_by=created_at.asc&&page=${page || 1}`
     );
 
+    if (!request.ok) {
+      throw new Error(`Error ${request.status}`);
+    }
+
     const response = await request.json();
     return response;
   }

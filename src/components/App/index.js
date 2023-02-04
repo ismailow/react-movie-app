@@ -20,6 +20,7 @@ export default class App extends Component {
     loading: true,
     ratedLoading: true,
     error: false,
+    ratedError: false,
     notFoundError: false,
     query: '',
     genres: [],
@@ -113,7 +114,13 @@ export default class App extends Component {
       .then((data) => {
         this.setState({ ratedMovies: data.results, totalRated: data.total_results });
       })
-      .then(() => this.setState({ ratedLoading: false }));
+      .then(() => this.setState({ ratedLoading: false }))
+      .catch(() =>
+        this.setState({
+          ratedError: true,
+          loading: false,
+        })
+      );
   };
 
   setStars = (id, value) => {
@@ -157,6 +164,7 @@ export default class App extends Component {
       ratedMovies,
       genres,
       ratedLoading,
+      ratedError,
       totalRated,
       ratedPage,
       guestId,
@@ -183,8 +191,9 @@ export default class App extends Component {
         }}
       />
     ) : null;
-    const hasRatedMovies = !ratedLoading;
+    const hasRatedMovies = !(ratedLoading || ratedError);
     const ratedSpinner = ratedLoading ? <Spin size="large" /> : null;
+    const ratedErrorMessage = ratedError ? <ErrorAlert message="Something went wrong" /> : null;
     const EmptyMessage =
       ratedMovies.length === 0 && !ratedLoading ? (
         <Alert
@@ -242,6 +251,7 @@ export default class App extends Component {
               <div className="rated-movies">{ShowRatedMovies}</div>
               {ratedSpinner}
               {ratedPagination}
+              {ratedErrorMessage}
             </Tabs.TabPane>
           </Tabs>
         </GenresContext.Provider>
